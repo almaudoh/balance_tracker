@@ -1,7 +1,6 @@
 ; $Id$
 name = Balance Tracker API
-description = API to create and manage financial account balances for your users.
+description = "API and UI tools to create and manage financial account balances for your users."
 package = Balance Tracker
-core = "6.x"
-version = "6.x-dev"
+core = 6.x
 dependencies[] = date_popup

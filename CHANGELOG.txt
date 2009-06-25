@@ -3,6 +3,9 @@
 Balance Tracker x.x-x.x, xxxx-xx-xx
 -----------------------------------
 
+Balance Tracker 6.X-1.1, 2009-06-25
+-----------------------------------
+Small issue with the info file not working with Update Status.
 
 Balance Tracker 6.X-1.0, 2009-06-25
 -----------------------------------

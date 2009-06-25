@@ -1,0 +1,10 @@
+# $Id 
+
+Balance Tracker x.x-x.x, xxxx-xx-xx
+-----------------------------------
+
+
+Balance Tracker 6.X-1.0, 2009-06-25
+-----------------------------------
+Initial release of balance_tracker module.
+

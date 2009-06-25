@@ -74,8 +74,7 @@ function balance_tracker_date_form($form_state) {
     $output .= '<p>'. t('This is your balance sheet.') .'</p>';
   }
 
-  $output .= '<p>'. t('This shows recent credits and debits to your account. Entries from a specific date period '.
-    'may be viewed by selecting a date range using the boxes below labelled \'From\' and \'To\'') .'</p>';
+  $output .= '<p>'. t('This shows recent credits and debits to your account. Entries from a specific date period may be viewed by selecting a date range using the boxes below labelled \'From\' and \'To\'') .'</p>';
 
   $form['helptext'] = array(
     '#type' => 'markup',

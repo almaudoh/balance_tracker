@@ -333,10 +333,10 @@ function balance_tracker_admin_form($form_state) {
  * Submission hook for the balance_tracker_admin_form.
  */
 function balance_tracker_admin_form_submit($form, &$form_state) {
-  variable_set('balance_tracker_currency_symbol', check_plain($form_state['values']['symbol']));
-  variable_set('balance_tracker_currency_symbol_position', check_plain($form_state['values']['symbol_position']));
-  variable_set('balance_tracker_thousands_separator', check_plain($form_state['values']['thousands_separator']));
-  variable_set('balance_tracker_decimal_separator', check_plain($form_state['values']['decimal_separator']));
+  variable_set('balance_tracker_currency_symbol', check_plain($form_state['values']['currency']['symbol']));
+  variable_set('balance_tracker_currency_symbol_position', check_plain($form_state['values']['currency']['symbol_position']));
+  variable_set('balance_tracker_thousands_separator', check_plain($form_state['values']['currency']['thousands_separator']));
+  variable_set('balance_tracker_decimal_separator', check_plain($form_state['values']['currency']['decimal_separator']));
   drupal_set_message('Balance Tracker settings saved.');
 }
 

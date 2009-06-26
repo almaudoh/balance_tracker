@@ -11,7 +11,11 @@
  * Implementation of hook_perm().
  */
 function balance_tracker_perm() {
-  return array('view own balance', 'view all balances', 'adjust user balances');
+  return array('view own balance', 
+    'view all balances', 
+    'adjust user balances',
+    'administer balance tracker',
+  );
 }
 
 /**
@@ -36,6 +40,12 @@ function balance_tracker_menu() {
     'page callback' => 'balance_tracker_all_balances_page',
     'access arguments' => array('view all balances'),
     'description' => 'View the balances of all site users.',
+  );
+  $items['admin/settings/balance'] = array(
+    'title' => 'Balance Tracker Settings',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('balance_tracker_admin_form'),
+    'access arguments' => array('administer balance tracker'),
   );
   return $items;
 }
@@ -272,6 +282,64 @@ function balance_tracker_get_user_sheet_form_submit($form, &$form_state) {
 }
 
 /**
+ * Function to build the admin form.
+ */
+function balance_tracker_admin_form($form_state) {
+  $form['currency'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Currency Settings'),
+    '#tree' => TRUE,
+  );
+  $form['currency']['symbol'] = array(
+    '#type' => 'textfield',
+    '#title' => 'Currency Symbol',
+    '#size' => 5,
+    '#default_value' => variable_get('balance_tracker_currency_symbol', '$'),
+    '#maxlength' => 5,
+    '#description' => t('Please enter the currency symbol you would like to use here. You may also look at <a href="http://www.xe.com/symbols.php">a list of currency symbols</a>.'),
+  );
+  $form['currency']['symbol_position'] = array(
+    '#type' => 'radios',
+    '#title' => t('Symbol Position'),
+    '#default_value' =>  variable_get('balance_tracker_currency_symbol_position', 'before'),
+    '#options' => array('before' => t('Before'), 'after' => t('After')),
+    '#description' => t('This controls whether the currency symbol appears before or after the currency value.'),
+  );
+  $form['currency']['thousands_separator'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Thousands Separator'),
+    '#default_value' => variable_get('balance_tracker_thousands_separator', ','),
+    '#size' => 3,
+    '#maxlength' => 1,
+    '#description' => t('Please set a thousands separator.'),
+  );
+  $form['currency']['decimal_separator'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Decimal Separator'),
+    '#default_value' => variable_get('balance_tracker_decimal_separator', '.'),
+    '#size' => 3,
+    '#maxlength' => 1,
+    '#description' => t('Please set a decimal separator.'),
+  );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save'),
+  );
+  return $form;
+}
+
+/**
+ * Submission hook for the balance_tracker_admin_form.
+ */
+function balance_tracker_admin_form_submit($form, &$form_state) {
+  variable_set('balance_tracker_currency_symbol', check_plain($form_state['values']['symbol']));
+  variable_set('balance_tracker_currency_symbol_position', check_plain($form_state['values']['symbol_position']));
+  variable_set('balance_tracker_thousands_separator', check_plain($form_state['values']['thousands_separator']));
+  variable_set('balance_tracker_decimal_separator', check_plain($form_state['values']['decimal_separator']));
+  drupal_set_message('Balance Tracker settings saved.');
+}
+
+/**
  * Implementation of hook_block().
  */
 function balance_tracker_block($op = 'list', $delta = 0, $edit = array()) {
@@ -332,14 +400,14 @@ function balance_tracker_balance_table($from, $to) {
   $rows = array();
   foreach ($records as $record) {
     $record['timestamp'] = date('m/d/Y h:i:s A', $record['timestamp']);
-    $record['balance'] = '$'. $record['balance'];
+    $record['balance'] = balance_tracker_format_currency($record['balance']);
 
     // Add class names to credits and debits so we can color them
     if ($record['type'] == 'debit') {
-      $record['amount'] = '<span class="debit">-$'. $record['amount'] .'</span>';
+      $record['amount'] = '<span class="debit">-'. balance_tracker_format_currency($record['amount']) .'</span>';
     }
     else if ($record['type'] == 'credit') {
-      $record['amount'] = '<span class="credit">$'. $record['amount'] .'</span>';
+      $record['amount'] = '<span class="credit">'. balance_tracker_format_currency($record['amount']) .'</span>';
     }
 
     unset($record['type']);
@@ -524,4 +592,28 @@ function balance_tracker_all_balances_page() {
   $output .= theme('pager');
 
   return $output;
+}
+
+/**
+ * Function to format a currency according to the admin settings.
+ *
+ * @param $value
+ *  A float containing the currency value to be displayed.
+ * @return
+ *  A string with the formatted currency.
+ */
+function balance_tracker_format_currency($value) {
+  $symbol = variable_get('balance_tracker_currency_symbol', '$');
+  $position = variable_get('balance_tracker_currency_symbol_position', 'before');
+  $thousands_separator = variable_get('balance_tracker_thousands_separator', ',');
+  $decimal_separator = variable_get('balance_tracker_decimal_separator', '.');
+
+  $number = number_format($value, 2, $decimal_separator, $thousands_separator);
+
+  if ($position == 'before') {
+    return $symbol . $number;
+  }
+  else {
+    return $number . $symbol;
+  }
 }

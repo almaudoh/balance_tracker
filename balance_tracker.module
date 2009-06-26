@@ -176,6 +176,7 @@ function balance_tracker_adjustment_form($form_state) {
     '#default_value' => '2.00',
     '#size' => 20,
     '#maxlength' => 64,
+    '#description' => t('Enter the amount you wish to credit the user here.'),
   );
   $form['message'] = array(
     '#type' => 'textfield',
@@ -581,7 +582,7 @@ function balance_tracker_all_balances_page() {
     $row['user'] = l($user->name, 'user/'. $user->uid .'/balance');
     unset($row['uid']);
 
-    $row['balance'] = '$'. $row['balance'];
+    $row['balance'] = balance_tracker_format_currency($record['balance']);
 
     // Reverse the array so $row['user'] is first.
     $row = array_reverse($row);

@@ -522,6 +522,8 @@ function _balance_tracker_create_entry($uid, $type, $amount, $message) {
   // db_query only returns a boolean false if the query fails. Therefore, we need to check if it is a boolean
   // *and* if it is false to determine what to returns.
   if ($success !== FALSE) {
+    // Invoke any hook_balance_write() implementations.
+    module_invoke_all('balance_write', $uid, $type, $amount, $message);
     return TRUE;
   }
   else {

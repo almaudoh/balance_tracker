@@ -322,6 +322,29 @@ function balance_tracker_admin_form($form_state) {
     '#maxlength' => 1,
     '#description' => t('Please set a decimal separator.'),
   );
+  $form['date'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Date Settings'),
+    '#tree' => TRUE,
+  );
+  $form['date']['format'] = array(
+    '#type' => 'radios',
+    '#title' => t('Date Format'),
+    '#default_value' =>  variable_get('balance_tracker_date_format', 'small'),
+    '#options' => array('small' => t('Short: @time', array('@time' => format_date(time(), 'small'))), 
+                        'medium' => t('Medium: @time', array('@time' => format_date(time(), 'medium'))),
+                        'large' => t('Long: @time', array('@time' => format_date(time(), 'large'))), 
+                        'custom' => t('Custom')),
+    '#description' => t('Please select a date format above. Short, Medium, and Long formats can be configured in the !link.', array('!link' => l('Date and Time settings', 'admin/settings/date-time/formats'))),
+  );
+  $form['date']['custom_format'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Custom Date Format'),
+    '#default_value' => variable_get('balance_tracker_custom_format', ''),
+    '#size' => 20,
+    '#maxlength' => 20,
+    '#description' => t('If you have chosen a Custom format above, please enter it here. See the !link for available format options.', array('!link' => '<a href="http://php.net/manual/function.date.php">PHP Manual</a>')),
+  );
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Save'),
@@ -330,14 +353,34 @@ function balance_tracker_admin_form($form_state) {
 }
 
 /**
+ * Validation hook for the balance_tracker_admin_form.
+ */
+function balance_tracker_admin_form_validate($form, &$form_state) {
+  if ($form_state['values']['date']['format'] == 'custom' && $form_state['values']['date']['custom_format'] == NULL) {
+    form_set_error('date', t('You must specify a format string if you have chosen to use a custom date format.'));
+  }
+}
+
+/**
  * Submission hook for the balance_tracker_admin_form.
  */
 function balance_tracker_admin_form_submit($form, &$form_state) {
+  // Save currency settings
   variable_set('balance_tracker_currency_symbol', check_plain($form_state['values']['currency']['symbol']));
   variable_set('balance_tracker_currency_symbol_position', check_plain($form_state['values']['currency']['symbol_position']));
   variable_set('balance_tracker_thousands_separator', check_plain($form_state['values']['currency']['thousands_separator']));
   variable_set('balance_tracker_decimal_separator', check_plain($form_state['values']['currency']['decimal_separator']));
-  drupal_set_message('Balance Tracker settings saved.');
+
+  // Save timestamp format settings.
+  variable_set('balance_tracker_date_format', $form_state['values']['date']['format']);
+  if ($form_state['values']['date']['format'] != 'custom') {
+    variable_del('balance_tracker_custom_format');
+  }
+  else {
+    variable_set('balance_tracker_custom_format', check_plain($form_state['values']['date']['custom_format']));
+  }
+  
+  drupal_set_message('Configuration settings saved.');
 }
 
 /**
@@ -400,7 +443,12 @@ function balance_tracker_balance_table($from, $to) {
   // Format the records from the DB before we display them.
   $rows = array();
   foreach ($records as $record) {
-    $record['timestamp'] = date('m/d/Y h:i:s A', $record['timestamp']);
+    // Get our date and time settings
+    $date_type = variable_get('balance_tracker_date_format', 'small');
+    $custom_format = variable_get('balance_tracker_custom_format', '');
+    $record['timestamp'] = format_date($record['timestamp'], $date_type, $custom_format);
+
+    // Format the currency as needed.
     $record['balance'] = balance_tracker_format_currency($record['balance']);
 
     // Add class names to credits and debits so we can color them

@@ -2,11 +2,12 @@
 
 Balance Tracker x.x-x.x, xxxx-xx-xx
 -----------------------------------
+#502952 by brianV: create date format settings on admin page, and format dates accordingly.
 
 Balance Tracker 6.X-1.2, 2009-06-26
 -----------------------------------
 by BrianV: bugfix with form values no longer saving correctly.
-#512458 by brianV: Finish allowing multiple currency formats.
+#502458 by brianV: Finish allowing multiple currency formats.
 by brianV: Create settings page and add currency format settings.
 
 Balance Tracker 6.X-1.1, 2009-06-25

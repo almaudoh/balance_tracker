@@ -2,6 +2,7 @@
 
 Balance Tracker x.x-x.x, xxxx-xx-xx
 -----------------------------------
+#502952 by brianV: Create a hook_update_N() entry, so the saved variable will be retained.
 #502952 by brianV: Rename balance_tracker_custom_format to balance_tracker_custom_date_format.
 by BrianV: create hook_balance_prewrite().
 by brianV: Create a hook_balance_write that is called after a balance is successfully written.

@@ -340,7 +340,7 @@ function balance_tracker_admin_form($form_state) {
   $form['date']['custom_format'] = array(
     '#type' => 'textfield',
     '#title' => t('Custom Date Format'),
-    '#default_value' => variable_get('balance_tracker_custom_format', ''),
+    '#default_value' => variable_get('balance_tracker_custom_date_format', ''),
     '#size' => 20,
     '#maxlength' => 20,
     '#description' => t('If you have chosen a Custom format above, please enter it here. See the !link for available format options.', array('!link' => '<a href="http://php.net/manual/function.date.php">PHP Manual</a>')),
@@ -374,10 +374,10 @@ function balance_tracker_admin_form_submit($form, &$form_state) {
   // Save timestamp format settings.
   variable_set('balance_tracker_date_format', $form_state['values']['date']['format']);
   if ($form_state['values']['date']['format'] != 'custom') {
-    variable_del('balance_tracker_custom_format');
+    variable_del('balance_tracker_custom_date_format');
   }
   else {
-    variable_set('balance_tracker_custom_format', check_plain($form_state['values']['date']['custom_format']));
+    variable_set('balance_tracker_custom_date_format', check_plain($form_state['values']['date']['custom_format']));
   }
   
   drupal_set_message('Configuration settings saved.');
@@ -445,7 +445,7 @@ function balance_tracker_balance_table($from, $to) {
   foreach ($records as $record) {
     // Get our date and time settings
     $date_type = variable_get('balance_tracker_date_format', 'small');
-    $custom_format = variable_get('balance_tracker_custom_format', '');
+    $custom_format = variable_get('balance_tracker_custom_date_format', '');
     $record['timestamp'] = format_date($record['timestamp'], $date_type, $custom_format);
 
     // Format the currency as needed.

@@ -2,7 +2,11 @@
 
 Balance Tracker x.x-x.x, xxxx-xx-xx
 -----------------------------------
+#502952 by brianV: Rename balance_tracker_custom_format to balance_tracker_custom_date_format.
+by BrianV: create hook_balance_prewrite().
+by brianV: Create a hook_balance_write that is called after a balance is successfully written.
 #502952 by brianV: create date format settings on admin page, and format dates accordingly.
+
 
 Balance Tracker 6.X-1.2, 2009-06-26
 -----------------------------------

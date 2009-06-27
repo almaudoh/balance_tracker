@@ -510,6 +510,9 @@ function balance_tracker_debit_account($uid, $amount, $message) {
  */
 function _balance_tracker_create_entry($uid, $type, $amount, $message) {
   $balance = balance_tracker_get_balance($uid);
+ 
+  // Invoke any hook_balance_prewrite() implementations.
+  module_invoke_all('balance_prewrite', $uid, $type, $amount, $message);
 
   if ($type == 'credit') {
     $balance += (float)$amount;

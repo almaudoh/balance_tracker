@@ -635,7 +635,7 @@ function balance_tracker_all_balances_page() {
     $row['user'] = l($user->name, 'user/'. $user->uid .'/balance');
     unset($row['uid']);
 
-    $row['balance'] = balance_tracker_format_currency($record['balance']);
+    $row['balance'] = balance_tracker_format_currency($row['balance']);
 
     // Reverse the array so $row['user'] is first.
     $row = array_reverse($row);

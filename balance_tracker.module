@@ -51,6 +51,37 @@ function balance_tracker_menu() {
 }
 
 /**
+ * Implementation of hook_block().
+ */
+function balance_tracker_block($op = 'list', $delta = 0, $edit = array()) {
+  if ($op == 'list') {
+    $blocks[0] = array('info' => t('User Balance Adjustment block'),
+      'weight' => 0, 'status' => 0, 'region' => 'left');
+    $blocks[1] = array('info' => t('User Balance Sheet selection block'),
+      'weight' => 0, 'status' => 0, 'region' => 'left');
+    return $blocks;
+  }
+  else if ($op == 'view') {
+    $block = array();
+    switch ($delta) {
+      case 0:
+        if (user_access('adjust user balances') === TRUE && (arg(0) == 'balance' || (arg(0) == 'user' && arg(2) == 'balance'))) {
+          $block = array('subject' => t('User Balance Adjustments'),
+            'content' => drupal_get_form('balance_tracker_adjustment_form'));
+        }
+        break;
+      case 1:
+        if (user_access('view all balances') === TRUE) {
+          $block = array('subject' => t('Select balance sheet'),
+            'content' => drupal_get_form('balance_tracker_get_user_sheet_form'));
+        }
+        break;
+    }
+    return $block;
+  }
+}
+
+/**
  * Builds the date selection form at the top of the balance page.
  */
 function balance_tracker_date_form($form_state) {
@@ -381,37 +412,6 @@ function balance_tracker_admin_form_submit($form, &$form_state) {
   }
   
   drupal_set_message('Configuration settings saved.');
-}
-
-/**
- * Implementation of hook_block().
- */
-function balance_tracker_block($op = 'list', $delta = 0, $edit = array()) {
-  if ($op == 'list') {
-    $blocks[0] = array('info' => t('User Balance Adjustment block'),
-      'weight' => 0, 'status' => 0, 'region' => 'left');
-    $blocks[1] = array('info' => t('User Balance Sheet selection block'),
-      'weight' => 0, 'status' => 0, 'region' => 'left');
-    return $blocks;
-  }
-  else if ($op == 'view') {
-    $block = array();
-    switch ($delta) {
-      case 0:
-        if (user_access('adjust user balances') === TRUE && (arg(0) == 'balance' || (arg(0) == 'user' && arg(2) == 'balance'))) {
-          $block = array('subject' => t('User Balance Adjustments'),
-            'content' => drupal_get_form('balance_tracker_adjustment_form'));
-        }
-        break;
-      case 1:
-        if (user_access('view all balances') === TRUE) {
-          $block = array('subject' => t('Select balance sheet'),
-            'content' => drupal_get_form('balance_tracker_get_user_sheet_form'));
-        }
-        break;
-    }
-    return $block;
-  }
 }
 
 /**

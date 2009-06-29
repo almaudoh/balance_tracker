@@ -2,6 +2,7 @@
 
 Balance Tracker x.x-x.x, xxxx-xx-xx
 -----------------------------------
+by brianV: Slight code reorganization - put the hook functions together.
 #505050 by brianV: Fix admin/reports/balances showing 0 for user balances.
 #502952 by brianV: Create a hook_update_N() entry, so the saved variable will be retained.
 #502952 by brianV: Rename balance_tracker_custom_format to balance_tracker_custom_date_format.

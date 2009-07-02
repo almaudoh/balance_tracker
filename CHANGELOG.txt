@@ -2,6 +2,7 @@
 
 Balance Tracker x.x-x.x, xxxx-xx-xx
 -----------------------------------
+#507438 by brianV: Add missing t()s and generate new .pot
 
 Balance Tracker 6.X-1.3, 2009-06-29
 -----------------------------------

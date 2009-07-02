@@ -128,7 +128,7 @@ function balance_tracker_date_form($form_state) {
 
   $form['date_from'] = array(
     '#type' => 'date_popup',
-    '#title' => 'From',
+    '#title' => t('From'),
     '#default_value' => date($format, $user->created),
     '#date_format' => $format,
     '#date_label_position' => 'within',
@@ -138,7 +138,7 @@ function balance_tracker_date_form($form_state) {
   );
   $form['date_to'] = array(
     '#type' => 'date_popup',
-    '#title' => 'To',
+    '#title' => t('To'),
     '#default_value' => date($format, $_SERVER['REQUEST_TIME']),
     '#date_format' => $format,
     '#date_label_position' => 'within',
@@ -195,7 +195,7 @@ function balance_tracker_adjustment_form($form_state) {
 
   $form['username'] = array(
     '#type' => 'textfield',
-    '#title' => 'User',
+    '#title' => t('User'),
     '#size' => 20,
     '#default_value' => $default_name,
     '#maxlength' => 128,

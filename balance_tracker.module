@@ -82,6 +82,30 @@ function balance_tracker_block($op = 'list', $delta = 0, $edit = array()) {
 }
 
 /**
+ * Implementation of hook_user().
+ */
+function balance_tracker_user($op, &$edit, &$account, $category = NULL) {
+  global $user;
+  if ($op == 'view' && variable_get('balance_tracker_show_in_profile', 'noshow') == 'show') {
+    if (($account->uid == $user->uid && user_access('view_own_balance')) || user_access('view all balances')) {
+      $balance = balance_tracker_format_currency(balance_tracker_get_balance($account->uid));
+      $value = $balance .'<p>'. l(t('View full balance sheet'), 'user/'. $account->uid .'/balance') .'</p>';
+      $account->content['user_balance'] = array(
+        '#type' => 'user_profile_category',
+        '#title' => t('Balance'),
+        '#weight' => 4,
+      );
+      $account->content['user_balance']['balance'] = array(
+        '#type' => 'user_profile_item',
+        '#title' => t('Current Balance'),
+        '#value' => $value,
+      );
+
+    }
+  }
+}
+
+/**
  * Builds the date selection form at the top of the balance page.
  */
 function balance_tracker_date_form($form_state) {
@@ -376,6 +400,15 @@ function balance_tracker_admin_form($form_state) {
     '#maxlength' => 20,
     '#description' => t('If you have chosen a Custom format above, please enter it here. See the !link for available format options.', array('!link' => '<a href="http://php.net/manual/function.date.php">PHP Manual</a>')),
   );
+  $form['show_balance_profile'] = array(
+    '#type' => 'radios',
+    '#title' => t('User profile'),
+    '#default_value' =>  variable_get('balance_tracker_show_in_profile', 'noshow'),
+    '#options' => array('show' => t('Show balance in user profile.'), 
+                        'noshow' => t('Do not show balance in user profile.'),
+                        ),
+    '#description' => t('Please select whether the user\'s balance should be shown in the user profile. Visibility is restricted via the \'view own balance\' and \'view all balances\' permissions.'),
+  );
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Save'),
@@ -410,6 +443,9 @@ function balance_tracker_admin_form_submit($form, &$form_state) {
   else {
     variable_set('balance_tracker_custom_date_format', check_plain($form_state['values']['date']['custom_format']));
   }
+
+  // Save user profile settings.
+  variable_set('balance_tracker_show_in_profile', $form_state['values']['show_balance_profile']);
   
   drupal_set_message('Configuration settings saved.');
 }

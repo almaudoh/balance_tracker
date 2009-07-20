@@ -5,6 +5,16 @@
  * @file
  * The .module file for the Balance Tracker module.
  */
+ 
+ /**
+ * Implementation of hook_views_api().
+ */
+function balance_tracker_views_api() {
+  return array(
+    'api' => 2.0,
+    'path' => drupal_get_path('module', 'balance_tracker') . '/includes',
+  );
+}
 
 
 /**

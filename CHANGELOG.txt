@@ -2,6 +2,7 @@
 
 Balance Tracker x.x-x.x, xxxx-xx-xx
 -----------------------------------
+#519770 by kidrobot: Initial commit of views integration code.
 
 Balance Tracker 6.X-1.4, 2009-07-15
 -----------------------------------

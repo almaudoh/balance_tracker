@@ -3,6 +3,7 @@
 Balance Tracker x.x-x.x, xxxx-xx-xx
 -----------------------------------
 #519770 by kidrobot: Initial commit of views integration code.
+#626068 by brianV: Sort queries by bid instead of timestamp.
 
 Balance Tracker 6.X-1.4, 2009-07-15
 -----------------------------------

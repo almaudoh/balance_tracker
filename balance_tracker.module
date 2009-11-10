@@ -591,7 +591,7 @@ function _balance_tracker_create_entry($uid, $type, $amount, $message) {
  *   in the balance items table, the balance is assumed to be 0.00.
  */
 function balance_tracker_get_balance($uid) {
-  $results = db_query_range("SELECT * FROM {balance_items} b WHERE b.uid = %d ORDER BY b.timestamp DESC", $uid, 0, 1);
+  $results = db_query_range("SELECT * FROM {balance_items} b WHERE b.uid = %d ORDER BY b.bid DESC", $uid, 0, 1);
 
   $result = db_fetch_object($results);
 
@@ -616,7 +616,7 @@ function balance_tracker_get_balance($uid) {
  *   An array of balance sheet entries.
  */
 function balance_tracker_get_items($uid, $per_page = 25) {
-  $results = pager_query("SELECT timestamp, message, type, amount, balance FROM {balance_items} b WHERE b.uid = %d ORDER BY b.timestamp", $per_page, 0, NULL, $uid);
+  $results = pager_query("SELECT timestamp, message, type, amount, balance FROM {balance_items} b WHERE b.uid = %d ORDER BY b.bid", $per_page, 0, NULL, $uid);
 
   $rows = array();
   while ($row = db_fetch_array($results)) {
@@ -643,7 +643,7 @@ function balance_tracker_get_items($uid, $per_page = 25) {
  *   An array of balance sheet entries in chronological order.
  */
 function balance_tracker_get_items_range($uid, $per_page = 25, $from, $to) {
-  $results = pager_query("SELECT timestamp, message, type, amount, balance FROM {balance_items} b WHERE b.uid = %d AND b.timestamp >= %d AND b.timestamp <= %d ORDER BY b.timestamp DESC", $per_page, 0, NULL, $uid, $from, $to);
+  $results = pager_query("SELECT timestamp, message, type, amount, balance FROM {balance_items} b WHERE b.uid = %d AND b.timestamp >= %d AND b.timestamp <= %d ORDER BY b.bid DESC", $per_page, 0, NULL, $uid, $from, $to);
 
   $rows = array();
   while ($row = db_fetch_array($results)) {

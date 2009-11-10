@@ -1,6 +1,9 @@
-# $Id 
+# $Id
 
 Balance Tracker x.x-x.x, xxxx-xx-xx
+-----------------------------------
+
+Balance Tracker 6.x-1.5, 2009-11-10
 -----------------------------------
 #519770 by kidrobot: Initial commit of views integration code.
 #626068 by brianV: Sort queries by bid instead of timestamp.

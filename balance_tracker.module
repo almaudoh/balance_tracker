@@ -21,10 +21,23 @@ function balance_tracker_views_api() {
  * Implementation of hook_perm().
  */
 function balance_tracker_perm() {
-  return array('view own balance', 
-    'view all balances', 
-    'adjust user balances',
-    'administer balance tracker',
+  return array(
+    'administer balance tracker' => array(
+      'title' => 'Adminster Balance Tracker',
+      'description' => 'User may adminster the balance tracker module settings',
+    ),
+    'view own balance' => array(
+      'title' => 'View own balance',
+      'description' => 'User may view their own balance',
+    ),
+    'view all balances' => array(
+      'title' => 'View all balances',
+      'description' => 'User may view all users\' balances',
+     ),
+    'adjust user balances' => array(
+      'title' => 'Adjust user balances',
+      'description' => 'User may manually adjust user balances',
+    ),
   );
 }
 
@@ -61,42 +74,55 @@ function balance_tracker_menu() {
 }
 
 /**
- * Implementation of hook_block().
+ * Implementation of hook_block_info().
  */
-function balance_tracker_block($op = 'list', $delta = 0, $edit = array()) {
-  if ($op == 'list') {
-    $blocks[0] = array('info' => t('User Balance Adjustment block'),
-      'weight' => 0, 'status' => 0, 'region' => 'left');
-    $blocks[1] = array('info' => t('User Balance Sheet selection block'),
-      'weight' => 0, 'status' => 0, 'region' => 'left');
-    return $blocks;
-  }
-  else if ($op == 'view') {
-    $block = array();
-    switch ($delta) {
-      case 0:
-        if (user_access('adjust user balances') === TRUE && (arg(0) == 'balance' || (arg(0) == 'user' && arg(2) == 'balance'))) {
-          $block = array('subject' => t('User Balance Adjustments'),
-            'content' => drupal_get_form('balance_tracker_adjustment_form'));
-        }
-        break;
-      case 1:
-        if (user_access('view all balances') === TRUE) {
-          $block = array('subject' => t('Select balance sheet'),
-            'content' => drupal_get_form('balance_tracker_get_user_sheet_form'));
-        }
-        break;
-    }
-    return $block;
-  }
+function balance_tracker_block_info() {
+  $blocks['bt_adjustment'] = array(
+    'info' => t('User Balance Adjustment block'),
+    'weight' => 0,
+    'status' => 0,
+    'region' => 'left',
+  );
+  $blocks['bt_selection'] = array(
+    'info' => t('User Balance Sheet selection block'),
+    'weight' => 0,
+    'status' => 0,
+    'region' => 'left',
+  );
+  return $blocks;
 }
 
 /**
- * Implementation of hook_user().
+* Implementation of hook_block_view().
+*/
+function balance_tracker_block_view($delta = '') { 
+  switch ($delta) {
+    case 'bt_adjustment':
+      if (user_access('adjust user balances') && (arg(0) == 'balance' || (arg(0) == 'user' && arg(2) == 'balance'))) {
+        $block = array(
+          'subject' => t('User Balance Adjustments'),
+          'content' => drupal_get_form('balance_tracker_adjustment_form'),
+        );
+      }
+      break;
+    case 'bt_selection':
+      if (user_access('view all balances')) {
+        $block = array(
+          'subject' => t('Select balance sheet'),
+          'content' => drupal_get_form('balance_tracker_get_user_sheet_form'),
+        );
+      }
+      break;
+  }
+  return $block;
+}
+
+/**
+ * Implementation of hook_user_view().
  */
-function balance_tracker_user($op, &$edit, &$account, $category = NULL) {
+function balance_tracker_user_view($account, $build_mode) {
   global $user;
-  if ($op == 'view' && variable_get('balance_tracker_show_in_profile', 'noshow') == 'show') {
+  if (variable_get('balance_tracker_show_in_profile', 'noshow') == 'show') {
     if (($account->uid == $user->uid && user_access('view_own_balance')) || user_access('view all balances')) {
       $balance = balance_tracker_format_currency(balance_tracker_get_balance($account->uid));
       $value = $balance .'<p>'. l(t('View full balance sheet'), 'user/'. $account->uid .'/balance') .'</p>';
@@ -110,7 +136,6 @@ function balance_tracker_user($op, &$edit, &$account, $category = NULL) {
         '#title' => t('Current Balance'),
         '#value' => $value,
       );
-
     }
   }
 }
@@ -152,8 +177,7 @@ function balance_tracker_date_form($form_state) {
   $output .= '<p>'. t('This shows recent credits and debits to your account. Entries from a specific date period may be viewed by selecting a date range using the boxes below labelled \'From\' and \'To\'') .'</p>';
 
   $form['helptext'] = array(
-    '#type' => 'markup',
-    '#value' => $output,
+    '#markup' => $output,
   );
 
   $form_state['redirect'] = NULL;
@@ -185,8 +209,7 @@ function balance_tracker_date_form($form_state) {
     '#value' => t('Display'),
   );
   $form['table'] = array(
-    '#type' => 'markup',
-    '#value' => balance_tracker_balance_table($from, $to),
+    '#markup' => balance_tracker_balance_table($from, $to),
   );
   return $form;
 }
@@ -396,9 +419,9 @@ function balance_tracker_admin_form($form_state) {
     '#type' => 'radios',
     '#title' => t('Date Format'),
     '#default_value' =>  variable_get('balance_tracker_date_format', 'small'),
-    '#options' => array('small' => t('Short: @time', array('@time' => format_date(time(), 'small'))), 
-                        'medium' => t('Medium: @time', array('@time' => format_date(time(), 'medium'))),
-                        'large' => t('Long: @time', array('@time' => format_date(time(), 'large'))), 
+    '#options' => array('small' => t('Short: @time', array('@time' => format_date(REQUEST_TIME, 'small'))), 
+                        'medium' => t('Medium: @time', array('@time' => format_date(REQUEST_TIME, 'medium'))),
+                        'large' => t('Long: @time', array('@time' => format_date(REQUEST_TIME, 'large'))), 
                         'custom' => t('Custom')),
     '#description' => t('Please select a date format above. Short, Medium, and Long formats can be configured in the !link.', array('!link' => l('Date and Time settings', 'admin/settings/date-time/formats'))),
   );
@@ -667,12 +690,12 @@ function balance_tracker_all_balances_page() {
     array('data' => t('Balance'), 'field' => 'bi1.balance', 'sort' => 'desc'),
   );
 
-  $results = pager_query("SELECT bi1.uid, bi1.balance
-                          FROM {balance_items} AS bi1 JOIN {balance_items} AS bi2
-                          ON bi2.uid = bi1.uid AND
-                             bi1.timestamp <= bi2.timestamp
-                          GROUP BY bi1.uid, bi1.balance
-                          HAVING COUNT(*) = 1" . tablesort_sql($header), 50, 0, NULL);
+  $results = pager_query("SELECT b1.uid, 
+                           (SELECT b.balance FROM {balance_items} b 
+                            WHERE b.uid = b1.uid 
+                            ORDER BY b.bid DESC LIMIT 0,1) as balance 
+                          FROM {balance_items} b1 
+                          GROUP BY b1.uid" . tablesort_sql($header), 50, 0, "SELECT COUNT(D	ISTINCT b1.uid) FROM {balance_items} b1");
 
   $rows = array();
   while ($row = db_fetch_array($results)) {

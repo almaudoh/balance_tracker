@@ -2,6 +2,8 @@
 
 Balance Tracker x.x-x.x, xxxx-xx-xx
 -----------------------------------
+Coding style fixes.
+Begin port to 7.x
 
 Balance Tracker 6.x-1.5, 2009-11-10
 -----------------------------------

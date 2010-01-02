@@ -5,8 +5,8 @@
  * @file
  * The .module file for the Balance Tracker module.
  */
- 
- /**
+
+/**
  * Implementation of hook_views_api().
  */
 function balance_tracker_views_api() {
@@ -18,9 +18,9 @@ function balance_tracker_views_api() {
 
 
 /**
- * Implementation of hook_perm().
+ * Implementation of hook_permission().
  */
-function balance_tracker_perm() {
+function balance_tracker_permission() {
   return array(
     'administer balance tracker' => array(
       'title' => 'Adminster Balance Tracker',
@@ -95,7 +95,7 @@ function balance_tracker_block_info() {
 /**
 * Implementation of hook_block_view().
 */
-function balance_tracker_block_view($delta = '') { 
+function balance_tracker_block_view($delta = '') {
   switch ($delta) {
     case 'bt_adjustment':
       if (user_access('adjust user balances') && (arg(0) == 'balance' || (arg(0) == 'user' && arg(2) == 'balance'))) {
@@ -103,6 +103,7 @@ function balance_tracker_block_view($delta = '') {
           'subject' => t('User Balance Adjustments'),
           'content' => drupal_get_form('balance_tracker_adjustment_form'),
         );
+        return $block;
       }
       break;
     case 'bt_selection':
@@ -111,10 +112,10 @@ function balance_tracker_block_view($delta = '') {
           'subject' => t('Select balance sheet'),
           'content' => drupal_get_form('balance_tracker_get_user_sheet_form'),
         );
+        return $block;
       }
       break;
   }
-  return $block;
 }
 
 /**
@@ -278,7 +279,10 @@ function balance_tracker_adjustment_form($form_state) {
     '#type' => 'radios',
     '#title' => t('Type'),
     '#default_value' =>  'credit',
-    '#options' => array('credit' => t('Credit'), 'debit' => t('Debit')),
+    '#options' => array(
+      'credit' => t('Credit'),
+      'debit' => t('Debit'),
+    ),
   );
   $form['submit'] = array(
     '#type' => 'submit',
@@ -391,7 +395,10 @@ function balance_tracker_admin_form($form_state) {
     '#type' => 'radios',
     '#title' => t('Symbol Position'),
     '#default_value' =>  variable_get('balance_tracker_currency_symbol_position', 'before'),
-    '#options' => array('before' => t('Before'), 'after' => t('After')),
+    '#options' => array(
+      'before' => t('Before'),
+      'after' => t('After'),
+    ),
     '#description' => t('This controls whether the currency symbol appears before or after the currency value.'),
   );
   $form['currency']['thousands_separator'] = array(
@@ -419,10 +426,12 @@ function balance_tracker_admin_form($form_state) {
     '#type' => 'radios',
     '#title' => t('Date Format'),
     '#default_value' =>  variable_get('balance_tracker_date_format', 'small'),
-    '#options' => array('small' => t('Short: @time', array('@time' => format_date(REQUEST_TIME, 'small'))), 
-                        'medium' => t('Medium: @time', array('@time' => format_date(REQUEST_TIME, 'medium'))),
-                        'large' => t('Long: @time', array('@time' => format_date(REQUEST_TIME, 'large'))), 
-                        'custom' => t('Custom')),
+    '#options' => array(
+      'small' => t('Short: @time', array('@time' => format_date(REQUEST_TIME, 'small'))),
+      'medium' => t('Medium: @time', array('@time' => format_date(REQUEST_TIME, 'medium'))),
+      'large' => t('Long: @time', array('@time' => format_date(REQUEST_TIME, 'large'))),
+      'custom' => t('Custom'),
+    ),
     '#description' => t('Please select a date format above. Short, Medium, and Long formats can be configured in the !link.', array('!link' => l('Date and Time settings', 'admin/settings/date-time/formats'))),
   );
   $form['date']['custom_format'] = array(
@@ -437,9 +446,10 @@ function balance_tracker_admin_form($form_state) {
     '#type' => 'radios',
     '#title' => t('User profile'),
     '#default_value' =>  variable_get('balance_tracker_show_in_profile', 'noshow'),
-    '#options' => array('show' => t('Show balance in user profile.'), 
-                        'noshow' => t('Do not show balance in user profile.'),
-                        ),
+    '#options' => array(
+      'show' => t('Show balance in user profile.'),
+      'noshow' => t('Do not show balance in user profile.'),
+    ),
     '#description' => t('Please select whether the user\'s balance should be shown in the user profile. Visibility is restricted via the \'view own balance\' and \'view all balances\' permissions.'),
   );
   $form['submit'] = array(
@@ -479,7 +489,7 @@ function balance_tracker_admin_form_submit($form, &$form_state) {
 
   // Save user profile settings.
   variable_set('balance_tracker_show_in_profile', $form_state['values']['show_balance_profile']);
-  
+
   drupal_set_message(t('Configuration settings saved.'));
 }
 
@@ -579,17 +589,17 @@ function balance_tracker_debit_account($uid, $amount, $message) {
  */
 function _balance_tracker_create_entry($uid, $type, $amount, $message) {
   $balance = balance_tracker_get_balance($uid);
- 
+
   // Invoke any hook_balance_prewrite() implementations.
   module_invoke_all('balance_prewrite', $uid, $type, $amount, $message);
 
   if ($type == 'credit') {
-    $balance += (float)$amount;
+    $balance += (float) $amount;
   }
   else {
-    $balance -= (float)$amount;
+    $balance -= (float) $amount;
   }
-  $success = db_query("INSERT INTO {balance_items} (uid, timestamp, type, message, amount, balance) VALUES (%d, %d, '%s', '%s', %f, %f)", $uid, $_SERVER['REQUEST_TIME'], $type, $message, (float)$amount, $balance);
+  $success = db_query("INSERT INTO {balance_items} (uid, timestamp, type, message, amount, balance) VALUES (%d, %d, '%s', '%s', %f, %f)", $uid, $_SERVER['REQUEST_TIME'], $type, $message, (float) $amount, $balance);
 
   // db_query only returns a boolean false if the query fails. Therefore, we need to check if it is a boolean
   // *and* if it is false to determine what to returns.
@@ -619,7 +629,7 @@ function balance_tracker_get_balance($uid) {
   $result = db_fetch_object($results);
 
   if ($result !== FALSE) {
-    return (float)$result->balance;
+    return (float) $result->balance;
   }
   else {
     return 0.00;
@@ -685,10 +695,13 @@ function balance_tracker_all_balances_page() {
   $output .= '<p>' . t('Here you can view the balances for all users.') . '</p>';
   $output .= '<p>' . t('The balance column is sortable. Click on a user\'s name to get their balance sheet.') . '</p>';
 
-  $header = array(
-    array('data' => t('User')),
-    array('data' => t('Balance'), 'field' => 'bi1.balance', 'sort' => 'desc'),
-  );
+  $header = array(array(
+      'data' => t('User'),
+    ), array(
+      'data' => t('Balance'),
+      'field' => 'bi1.balance',
+      'sort' => 'desc',
+    ));
 
   $results = pager_query("SELECT b1.uid, 
                            (SELECT b.balance FROM {balance_items} b 

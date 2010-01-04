@@ -3,6 +3,7 @@
 Balance Tracker x.x-x.x, xxxx-xx-xx
 -----------------------------------
 More 7.x porting fixes.
+More 7.x porting fixes.
 Coding style fixes.
 Begin port to 7.x
 

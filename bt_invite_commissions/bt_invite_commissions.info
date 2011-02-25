@@ -1,4 +1,3 @@
-; $Id$
 name = Invite Commissions
 description = "Credit a commission for any purchases made by invited users to their inviter."
 package = Balance Tracker

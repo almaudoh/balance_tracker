@@ -27,7 +27,7 @@ Install as usual, see http://drupal.org/node/70151 for further information.
 
 Q. Where can I see user's balance sheets?
 
-A. User balance sheets can be viewed at user/balance or user/%uid/balance.
+A. User balance sheets can be viewed at "balance" or "user/%uid/balance".
    Please note that the 'view all balances' and 'view own balances' must be
    set accordingly.
 

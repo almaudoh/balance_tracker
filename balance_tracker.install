@@ -66,11 +66,9 @@ function balance_tracker_schema() {
   return $schema;
 }
 
-function balance_tracker_install() {
-  // Create my tables.
-  drupal_install_schema('balance_tracker');
-}
-
+/**
+ * Implementation of hook_uninstall().
+ */
 function balance_tracker_uninstall() {
   // Drop my tables.
   drupal_uninstall_schema('balance_tracker');

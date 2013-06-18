@@ -134,7 +134,7 @@ function balance_tracker_user_view($account, $build_mode) {
       $account->content['user_balance']['balance'] = array(
         '#type' => 'user_profile_item',
         '#title' => t('Current Balance'),
-        '#value' => $value,
+        '#markup' => $value,
       );
     }
   }

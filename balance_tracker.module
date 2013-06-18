@@ -648,7 +648,12 @@ function _balance_tracker_create_entry($uid, $type, $amount, $message) {
  *   in the balance items table, the balance is assumed to be 0.00.
  */
 function balance_tracker_get_balance($uid) {
-  $result = db_query("SELECT * FROM {balance_items} WHERE uid = :uid ORDER BY bid DESC LIMIT 1", array(':uid' => $uid))->fetchObject();
+  $result = db_select('balance_items', 'bi')
+    ->fields('bi', array('balance'))
+    ->condition('uid', $uid, '=')
+    ->orderBy('bi.bid', 'DESC')
+    ->execute()
+    ->fetchObject();
   
   if ($result !== FALSE) {
     return (float) $result->balance;

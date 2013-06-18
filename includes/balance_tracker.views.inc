@@ -31,8 +31,8 @@ function balance_tracker_views_data() {
   $data['balance_items']['bid'] = array(
     'title' => t('Balance ID'),
     'help' => t('The unique identifier for this balance item.'),
-		'field' => array(
-      'handler' => 'views_handler_field_numeric',
+    'field' => array(
+    'handler' => 'views_handler_field_numeric',
       'click sortable' => TRUE,
      ),
     'filter' => array(
@@ -86,7 +86,7 @@ function balance_tracker_views_data() {
     'title' => t('Type'),
     'help' => t('Whether this item is a credit or debit.'),
     
-		'field' => array(
+    'field' => array(
       'handler' => 'views_handler_field',
       'click sortable' => TRUE,
     ),
@@ -102,7 +102,7 @@ function balance_tracker_views_data() {
   $data['balance_items']['message'] = array(
     'title' => t('Message'),
     'help' => t('Log message related to this item.'),
-		'field' => array(
+    'field' => array(
       'handler' => 'views_handler_field_xss',
       'click sortable' => TRUE,
      ),
@@ -159,7 +159,7 @@ function balance_tracker_views_handlers() {
     ),
     'handlers' => array(
       'balance_tracker_handler_filter_balance_items_type' => array(
-        'parent' =>'views_handler_filter_in_operator',
+        'parent' => 'views_handler_filter_in_operator',
       ),
     ),
   );

@@ -123,7 +123,7 @@ function balance_tracker_block_view($delta = '') {
 function balance_tracker_user_view($account, $build_mode) {
   global $user;
   if (variable_get('balance_tracker_show_in_profile', 'noshow') == 'show') {
-    if (($account->uid == $user->uid && user_access('view_own_balance')) || user_access('view all balances')) {
+    if (($account->uid == $user->uid && user_access('view own balance')) || user_access('view all balances')) {
       $balance = balance_tracker_format_currency(balance_tracker_get_balance($account->uid));
       $value = $balance . '<p>' . l(t('View full balance sheet'), 'user/' . $account->uid . '/balance') . '</p>';
       $account->content['user_balance'] = array(

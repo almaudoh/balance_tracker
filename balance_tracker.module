@@ -182,7 +182,7 @@ function balance_tracker_date_form($form_state) {
 
   $form_state['redirect'] = NULL;
 
-  $format = 'm/d/Y';
+  $format = 'Y-m-d H:i:s';
 
   /*$form['date_from'] = array(
     '#type' => 'date_popup',

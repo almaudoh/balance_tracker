@@ -397,7 +397,7 @@ function balance_tracker_admin_form($form_state) {
     '#title' => 'Currency Symbol',
     '#size' => 5,
     '#default_value' => variable_get('balance_tracker_currency_symbol', '$'),
-    '#maxlength' => 5,
+    '#maxlength' => 15,
     '#description' => t('Please enter the currency symbol you would like to use here. You may also look at <a href="http://www.xe.com/symbols.php">a list of currency symbols</a>.'),
   );
   $form['currency']['symbol_position'] = array(

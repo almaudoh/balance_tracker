@@ -3,38 +3,36 @@
  * @file
  * Provide views data and handlers for balance_tracker.module
  */
- 
- /**
- * Implementation of hook_views_data()
+
+/**
+ * Implements of hook_views_data().
  */
 function balance_tracker_views_data() {
-  // ----------------------------------------------------------------
-  // balance_items table
-
-  $data['balance_items']['table']['group']  = t('Balances');
+  // balance_items table.
+  $data['balance_items']['table']['group'] = t('Balances');
 
   $data['balance_items']['table']['join'] = array(
-    // ...to the user table
+    // ...to the user table.
     'users' => array(
       'left_field' => 'uid',
       'field' => 'uid',
     ),
   );
-  
+
   $data['balance_items']['table']['base'] = array(
     'field' => 'bid',
     'title' => t('Balance item'),
-    'help' => t("Balances are amounts credited or debited to a user."),
+    'help' => t('Balances are amounts credited or debited to a user.'),
   );
-  
-// bid
+
+  // bid.
   $data['balance_items']['bid'] = array(
     'title' => t('Balance ID'),
     'help' => t('The unique identifier for this balance item.'),
     'field' => array(
-    'handler' => 'views_handler_field_numeric',
+      'handler' => 'views_handler_field_numeric',
       'click sortable' => TRUE,
-     ),
+    ),
     'filter' => array(
       'handler' => 'views_handler_filter_numeric',
     ),
@@ -42,16 +40,16 @@ function balance_tracker_views_data() {
       'handler' => 'views_handler_sort',
     ),
   );
-  
-  // user
+
+  // user.
   $data['balance_items']['uid'] = array(
     'title' => t('User'),
     'help' => t('The ID of the user this item belongs to.'),
     'field' => array(
       'handler' => 'views_handler_field_numeric',
       'click sortable' => TRUE,
-     ),
-     'filter' => array(
+    ),
+    'filter' => array(
       'handler' => 'views_handler_filter_numeric',
     ),
     'sort' => array(
@@ -61,14 +59,13 @@ function balance_tracker_views_data() {
       'handler' => 'views_handler_relationship',
       'base' => 'users',
       'field' => 'uid',
-     ),
+    ),
   );
-  
-    // timestamp
+
+  // timestamp.
   $data['balance_items']['timestamp'] = array(
     'title' => t('Timestamp'),
     'help' => t('The timestamp this item was created.'),
-
     'field' => array(
       'handler' => 'views_handler_field_date',
       'click sortable' => TRUE,
@@ -80,12 +77,11 @@ function balance_tracker_views_data() {
       'handler' => 'views_handler_sort',
     ),
   );
-  
-   // type
+
+  // type.
   $data['balance_items']['type'] = array(
     'title' => t('Type'),
     'help' => t('Whether this item is a credit or debit.'),
-    
     'field' => array(
       'handler' => 'views_handler_field',
       'click sortable' => TRUE,
@@ -98,28 +94,27 @@ function balance_tracker_views_data() {
     ),
   );
 
-  // message
+  // message.
   $data['balance_items']['message'] = array(
     'title' => t('Message'),
     'help' => t('Log message related to this item.'),
     'field' => array(
       'handler' => 'views_handler_field_xss',
       'click sortable' => TRUE,
-     ),
+    ),
     'filter' => array(
       'handler' => 'views_handler_filter_string',
     ),
   );
 
-  // amount
+  // amount.
   $data['balance_items']['amount'] = array(
     'title' => t('Amount'),
     'help' => t('The amount credited or debited with this transaction.'),
-
     'field' => array(
       'handler' => 'views_handler_field_numeric',
       'click sortable' => TRUE,
-     ),
+    ),
     'filter' => array(
       'handler' => 'views_handler_filter_numeric',
     ),
@@ -127,16 +122,15 @@ function balance_tracker_views_data() {
       'handler' => 'views_handler_sort',
     ),
   );
-  
-  // balance
+
+  // balance.
   $data['balance_items']['balance'] = array(
     'title' => t('Balance'),
     'help' => t('The balance after a transaction has taken place.'),
-
     'field' => array(
       'handler' => 'views_handler_field_numeric',
       'click sortable' => TRUE,
-     ),
+    ),
     'filter' => array(
       'handler' => 'views_handler_filter_numeric',
     ),
@@ -145,12 +139,11 @@ function balance_tracker_views_data() {
     ),
   );
 
-return $data;
+  return $data;
 }
 
 /**
- * Implementation of hook_views_handlers() to register all of the basic handlers
- * views uses.
+ * Implements of hook_views_handlers().
  */
 function balance_tracker_views_handlers() {
   return array(
@@ -164,4 +157,3 @@ function balance_tracker_views_handlers() {
     ),
   );
 }
-

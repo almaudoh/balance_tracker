@@ -1,4 +1,3 @@
-# $Id
 
 -- SUMMARY --
 
@@ -45,4 +44,3 @@ This project has been sponsored by:
 * FellowZins
   The first social netmarketing website on the web. 
   http://www.fellowzins.com
-

@@ -71,19 +71,3 @@ function balance_tracker_schema() {
   );
   return $schema;
 }
-
-/**
- * Implementation of hook_uninstall().
- */
-function balance_tracker_uninstall() {
-  // Drop my tables.
-  drupal_uninstall_schema('balance_tracker');
-}
-
-/**
- * The balance_tracker_custom_format variable was renamed to balance_tracker_custom_date_format.
- */
-function admin_menu_update_6101() {
-  $format = variable_get('balance_tracker_custom_format', '$');
-  variable_set('balance_tracker_custom_date_format', $format);
-}

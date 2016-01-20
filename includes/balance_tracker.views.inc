@@ -30,14 +30,14 @@ function balance_tracker_views_data() {
     'title' => t('Balance ID'),
     'help' => t('The unique identifier for this balance item.'),
     'field' => array(
-      'handler' => 'views_handler_field_numeric',
+      'id' => 'numeric',
       'click sortable' => TRUE,
     ),
     'filter' => array(
-      'handler' => 'views_handler_filter_numeric',
+      'id' => 'numeric',
     ),
     'sort' => array(
-      'handler' => 'views_handler_sort',
+      'id' => 'standard',
     ),
   );
 
@@ -46,17 +46,17 @@ function balance_tracker_views_data() {
     'title' => t('User'),
     'help' => t('The ID of the user this item belongs to.'),
     'field' => array(
-      'handler' => 'views_handler_field_numeric',
+      'id' => 'numeric',
       'click sortable' => TRUE,
     ),
     'filter' => array(
-      'handler' => 'views_handler_filter_numeric',
+      'id' => 'numeric',
     ),
     'sort' => array(
-      'handler' => 'views_handler_sort',
+      'id' => 'standard',
     ),
     'relationship' => array(
-      'handler' => 'views_handler_relationship',
+      'id' => 'standard',
       'base' => 'users',
       'field' => 'uid',
     ),
@@ -67,14 +67,14 @@ function balance_tracker_views_data() {
     'title' => t('Timestamp'),
     'help' => t('The timestamp this item was created.'),
     'field' => array(
-      'handler' => 'views_handler_field_date',
+      'id' => 'date',
       'click sortable' => TRUE,
     ),
     'filter' => array(
-      'handler' => 'views_handler_filter_date',
+      'id' => 'date',
     ),
     'sort' => array(
-      'handler' => 'views_handler_sort',
+      'id' => 'date',
     ),
   );
 
@@ -83,14 +83,14 @@ function balance_tracker_views_data() {
     'title' => t('Type'),
     'help' => t('Whether this item is a credit or debit.'),
     'field' => array(
-      'handler' => 'views_handler_field',
+      'id' => 'standard',
       'click sortable' => TRUE,
     ),
     'filter' => array(
-      'handler' => 'balance_tracker_handler_filter_balance_items_type',
+      'id' => 'balance_items_type',
     ),
     'sort' => array(
-      'handler' => 'views_handler_sort',
+      'id' => 'standard',
     ),
   );
 
@@ -99,11 +99,11 @@ function balance_tracker_views_data() {
     'title' => t('Message'),
     'help' => t('Log message related to this item.'),
     'field' => array(
-      'handler' => 'views_handler_field_xss',
+      'id' => 'markup',
       'click sortable' => TRUE,
     ),
     'filter' => array(
-      'handler' => 'views_handler_filter_string',
+      'id' => 'string',
     ),
   );
 
@@ -112,14 +112,14 @@ function balance_tracker_views_data() {
     'title' => t('Amount'),
     'help' => t('The amount credited or debited with this transaction.'),
     'field' => array(
-      'handler' => 'views_handler_field_numeric',
+      'id' => 'numeric',
       'click sortable' => TRUE,
     ),
     'filter' => array(
-      'handler' => 'views_handler_filter_numeric',
+      'id' => 'numeric',
     ),
     'sort' => array(
-      'handler' => 'views_handler_sort',
+      'id' => 'standard',
     ),
   );
 
@@ -128,32 +128,16 @@ function balance_tracker_views_data() {
     'title' => t('Balance'),
     'help' => t('The balance after a transaction has taken place.'),
     'field' => array(
-      'handler' => 'views_handler_field_numeric',
+      'id' => 'numeric',
       'click sortable' => TRUE,
     ),
     'filter' => array(
-      'handler' => 'views_handler_filter_numeric',
+      'id' => 'numeric',
     ),
     'sort' => array(
-      'handler' => 'views_handler_sort',
+      'id' => 'standard',
     ),
   );
 
   return $data;
-}
-
-/**
- * Implements of hook_views_handlers().
- */
-function balance_tracker_views_handlers() {
-  return array(
-    'info' => array(
-      'path' => drupal_get_path('module', 'balance_tracker') . '/includes',
-    ),
-    'handlers' => array(
-      'balance_tracker_handler_filter_balance_items_type' => array(
-        'parent' => 'views_handler_filter_in_operator',
-      ),
-    ),
-  );
 }

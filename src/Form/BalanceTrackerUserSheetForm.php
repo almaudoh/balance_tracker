@@ -41,7 +41,6 @@ class BalanceTrackerUserSheetForm extends FormBase {
    * {@inheritdoc}
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
-    $user = \Drupal::currentUser();
     $uid = $form_state->getValue('username');
     $account = User::load($uid);
     // Check if form is blank.
@@ -56,7 +55,7 @@ class BalanceTrackerUserSheetForm extends FormBase {
     if (!$this->currentUser()->hasPermission('adjust user balances')) {
       $form_state->setErrorByName('', $this->t('You do not have permission to make user balance adjustments.'));
     }
-    if ($form_state->getValue('username') != $user->getAccountName() && !$this->currentUser()->hasPermission('view all balances')) {
+    if ($form_state->getValue('username') != $this->currentUser()->getAccountName() && !$this->currentUser()->hasPermission('view all balances')) {
       $form_state->setErrorByName('', $this->t('You do not have permission to view other users balance sheets.'));
     }
   }

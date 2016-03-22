@@ -6,29 +6,29 @@
  */
 
 use Drupal\Component\Render\FormattableMarkup;
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\Core\Url;
 use Drupal\user\Entity\User;
+use Drupal\user\UserInterface;
 
 /**
  * Implements of hook_user_view().
  */
-function balance_tracker_user_view(array &$build, \Drupal\user\UserInterface &$build, \Drupal\user\UserInterface &$build, \Drupal\user\UserInterface &$build, \Drupal\user\UserInterface &$build, \Drupal\user\UserInterface &$build, \Drupal\user\UserInterface &$build, \Drupal\user\UserInterface &$build, \Drupal\user\UserInterface &$build, \Drupal\user\UserInterface &$build, \Drupal\user\UserInterface &$build, \Drupal\user\UserInterface &$build, \Drupal\user\UserInterface &$build, \Drupal\user\UserInterface &$build, \Drupal\user\UserInterface &$build, \Drupal\user\UserInterface &$build, \Drupal\user\UserInterface &$build, \Drupal\user\UserInterface &$build, \Drupal\user\UserInterface &$build, \Drupal\user\UserInterface &$build, \Drupal\user\UserInterface &$build, \Drupal\user\UserInterface &$build, \Drupal\user\UserInterface &$build, \Drupal\user\UserInterface &$build, \Drupal\user\UserInterface &$build, \Drupal\user\UserInterface &$build, \Drupal\user\UserInterface &$build, \Drupal\user\UserInterface &$build, \Drupal\user\UserInterface &$build, \Drupal\user\UserInterface &$build, \Drupal\user\UserInterface &$build, \Drupal\user\UserInterface &$build, \Drupal\user\UserInterface &$build, \Drupal\user\UserInterface &$build, \Drupal\user\UserInterface &$build, \Drupal\user\UserInterface &$build, \Drupal\user\UserInterface &$build, \Drupal\user\UserInterface &$build, \Drupal\user\UserInterface &$build, \Drupal\user\UserInterface &$build, \Drupal\user\UserInterface &$build, \Drupal\user\UserInterface &$build, \Drupal\user\UserInterface &$build, \Drupal\user\UserInterface &$build, \Drupal\user\UserInterface &$build, \Drupal\user\UserInterface &$build, \Drupal\user\UserInterface &$build, \Drupal\user\UserInterface &$build, \Drupal\user\UserInterface $account, $build_mode) {
-  $user = \Drupal::currentUser();
-  if (\Drupal::config('balance_tracker.settings')->get('balance_tracker_show_in_profile') == 'show') {
-    if (($account->id() == $user->uid && \Drupal::currentUser()->hasPermission('view own balance')) || \Drupal::currentUser()->hasPermission('view all balances')) {
-      $balance = balance_tracker_format_currency(balance_tracker_get_balance($account->id()));
-      // @FIXME
-// l() expects a Url object, created from a route name or external URI.
-// $value = $balance . '<p>' . l(t('View full balance sheet'), 'user/' . $account->uid . '/balance') . '</p>';
-
-      $account->content['user_balance'] = array(
-        '#type' => 'user_profile_category',
-        '#title' => t('Balance'),
-        '#weight' => 4,
-      );
-      $account->content['user_balance']['balance'] = array(
-        '#type' => 'user_profile_item',
-        '#title' => t('Current Balance'),
-        '#markup' => $value,
+function balance_tracker_user_view(array &$build, UserInterface $account, EntityViewDisplayInterface $display, $build_mode) {
+  $current_user = \Drupal::currentUser();
+  if (\Drupal::config('balance_tracker.settings')->get('show_in_profile')) {
+    if (($account->id() == $current_user->id() && $current_user->hasPermission('view own balance')) || $current_user->hasPermission('view all balances')) {
+      $balance = balance_tracker_format_currency(\Drupal::service('balance_tracker.storage')->getBalance($account->id()));
+      $build['user_balance'] = array(
+        '#type' => 'item',
+        '#markup' => '<h4 class="label">' . t('Current Balance') . '</h4> ' . $balance,
+        'link' => [
+          '#type' => 'link',
+          '#title' => t('View full balance sheet'),
+          '#url' => new Url('balance_tracker.user_balance', ['user' => $account->id()]),
+          '#prefix' => '<p>',
+          '#suffix' => '</p>',
+        ],
       );
     }
   }

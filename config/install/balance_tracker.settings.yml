@@ -1,4 +1,4 @@
-show_in_profile: noshow
+show_in_profile: false
 currency_symbol: $
 currency_symbol_position: before
 thousands_separator: ','

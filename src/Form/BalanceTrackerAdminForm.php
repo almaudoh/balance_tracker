@@ -100,19 +100,15 @@ class BalanceTrackerAdminForm extends ConfigFormBase {
       '#title' => $this->t('Display settings'),
       '#tree' => TRUE,
     ];
-    $form['display']['show_balance_profile'] = [
+    $form['display']['show_in_profile'] = [
       '#type' => 'radios',
       '#title' => $this->t('User profile'),
-      '#default_value' => $config->get('show_in_profile'),
+      '#default_value' => $config->get('show_in_profile') ? 'show' : 'noshow',
       '#options' => [
         'show' => $this->t('Show balance in user profile.'),
         'noshow' => $this->t('Do not show balance in user profile.'),
       ],
       '#description' => $this->t("Please select whether the user's balance should be shown in the user profile. Visibility is restricted via the 'view own balance' and 'view all balances' permissions."),
-    ];
-    $form['submit'] = [
-      '#type' => 'submit',
-      '#value' => $this->t('Save'),
     ];
     return $form;
   }
@@ -148,7 +144,7 @@ class BalanceTrackerAdminForm extends ConfigFormBase {
     }
 
     // Save user profile settings.
-    $config->set('show_in_profile', $form_state->getValue(['show_balance_profile']));
+    $config->set('show_in_profile', $form_state->getValue(['display', 'show_in_profile']));
 
     // Save new config settings.
     $config->save();

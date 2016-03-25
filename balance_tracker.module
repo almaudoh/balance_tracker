@@ -12,11 +12,11 @@ use Drupal\user\Entity\User;
 use Drupal\user\UserInterface;
 
 /**
- * Implements of hook_user_view().
+ * Implements of hook_user_view_alter().
  */
-function balance_tracker_user_view(array &$build, UserInterface $account, EntityViewDisplayInterface $display, $build_mode) {
+function balance_tracker_user_view_alter(array &$build, UserInterface $account, EntityViewDisplayInterface $display) {
   $current_user = \Drupal::currentUser();
-  if (\Drupal::config('balance_tracker.settings')->get('show_in_profile')) {
+  if (\Drupal::config('balance_tracker.settings')->get('show_in_profile') && $build['#view_mode'] == 'full') {
     if (($account->id() == $current_user->id() && $current_user->hasPermission('view own balance')) || $current_user->hasPermission('view all balances')) {
       $balance = balance_tracker_format_currency(\Drupal::service('balance_tracker.storage')->getBalance($account->id()));
       $build['user_balance'] = array(

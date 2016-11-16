@@ -1,0 +1,29 @@
+balance_tracker.balance:
+  path: /balance
+  defaults:
+    _title: 'Your Balance'
+    _form: \Drupal\balance_tracker\Form\BalanceTrackerDateForm
+  requirements:
+    _permission: 'view own balance'
+balance_tracker.user_balance:
+  path: /user/{user}/balance
+  defaults:
+    _title: 'User''s Balance'
+    _form: \Drupal\balance_tracker\Form\BalanceTrackerDateForm
+  requirements:
+    _permission: 'view all balances'
+    user: \d+
+balance_tracker.all_balances_page:
+  path: /admin/reports/balances
+  defaults:
+    _title: 'User Balances'
+    _controller: \Drupal\balance_tracker\Controller\DefaultController::allBalancesPage
+  requirements:
+    _permission: 'view all balances'
+balance_tracker.admin_form:
+  path: /admin/settings/balance
+  defaults:
+    _title: 'Balance Tracker Settings'
+    _form: \Drupal\balance_tracker\Form\BalanceTrackerAdminForm
+  requirements:
+    _permission: 'administer balance tracker'

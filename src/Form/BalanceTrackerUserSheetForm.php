@@ -1,17 +1,14 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\balance_tracker\Form\BalanceTrackerUserSheetForm.
- */
-
 namespace Drupal\balance_tracker\Form;
 
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Render\Element;
 use Drupal\user\Entity\User;
 
+/**
+ * Builds the form to retrieve the balance sheet of a specific user.
+ */
 class BalanceTrackerUserSheetForm extends FormBase {
 
   /**
@@ -55,7 +52,7 @@ class BalanceTrackerUserSheetForm extends FormBase {
     if (!$this->currentUser()->hasPermission('adjust user balances')) {
       $form_state->setErrorByName('', $this->t('You do not have permission to make user balance adjustments.'));
     }
-    if ($form_state->getValue('username') != $this->currentUser()->getAccountName() && !$this->currentUser()->hasPermission('view all balances')) {
+    if ($form_state->getValue('username') !== $this->currentUser()->getAccountName() && !$this->currentUser()->hasPermission('view all balances')) {
       $form_state->setErrorByName('', $this->t('You do not have permission to view other users balance sheets.'));
     }
   }

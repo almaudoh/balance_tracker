@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\balance_tracker\BalanceTrackerStorage.
- */
-
 namespace Drupal\balance_tracker;
 
 use Drupal\Core\Cache\Cache;
@@ -13,10 +8,7 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 
 /**
  * The balance tracker service that keeps track of the user balances.
- *
- * @package Drupal\balance_tracker
  */
-
 class BalanceTrackerStorage {
 
   /**
@@ -177,17 +169,17 @@ class BalanceTrackerStorage {
    *   An array of balance sheet entries in chronological order.
    */
   public function getItemsRange($uid, $per_page = 25, $from = 0, $to = REQUEST_TIME) {
-    $rows = array();
+    $rows = [];
     $query = $this->database->select('balance_items', 'b')
       ->extend('Drupal\Core\Database\Query\PagerSelectExtender');
-    $query
-      ->fields('b', array('timestamp', 'message', 'type', 'amount', 'balance'))
+    $results = $query
+      ->fields('b', ['timestamp', 'message', 'type', 'amount', 'balance'])
       ->condition('uid', $uid)
-      ->condition('timestamp', $from, '>')
-      ->condition('timestamp', $to, '<')
-      ->limit($per_page);
-    $query->orderBy('bid', 'DESC');
-    $results = $query->execute();
+      ->condition('timestamp', $from, '>=')
+      ->condition('timestamp', $to, '<=')
+      ->limit($per_page)
+      ->orderBy('bid', 'DESC')
+      ->execute();
 
     foreach ($results as $row) {
       $rows[] = $row;

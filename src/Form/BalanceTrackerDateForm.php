@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\balance_tracker\Form\BalanceTrackerDateForm.
- */
-
 namespace Drupal\balance_tracker\Form;
 
 use Drupal\Core\Form\FormBase;
@@ -36,65 +31,71 @@ class BalanceTrackerDateForm extends FormBase {
     // Preset $to and $from based on form variables if available, or on sensible
     // defaults if not. 86400 added to $to since to set the time to the end of the
     // selected day.
-    if (!$form_state->get('date_to')) {
+    if ($form_state->get('date_to')) {
       $to = strtotime($form_state->get('date_to')) + 86400;
     }
     else {
-      $to = $_SERVER['REQUEST_TIME'];
+      $to = REQUEST_TIME;
+    }
+
+    // Set viewed user in case we're looking at someone else's account.
+    if ($this->getRouteMatch()->getRouteName() === 'balance_tracker.user_balance'
+      && ($uid = $this->getRequest()->get('user')) && $uid != $user->id()) {
+      /** @var \Drupal\user\Entity\User $viewed_user */
+      $viewed_user = User::load($uid);
+    }
+    else {
+      $viewed_user = $user;
     }
 
     // Use value from form.
-    if (!$form_state->get('date_from')) {
+    if ($form_state->get('date_from')) {
       $from = strtotime($form_state->get('date_from'));
     }
-    // Use viewed user (looking at someone else's account).
-    elseif (($uid = $this->getRequest()->get('user')) && $uid != $user->id()) {
-      /** @var \Drupal\user\Entity\User $viewed_user */
-      $viewed_user = User::load($uid);
-      $from = $viewed_user->getCreatedTime();
-      $output .= '<p>' . t("This is @user's balance sheet.", ['@user' => $viewed_user->getAccountName()]) . '</p>';
-    }
-    // Looking at own account.
     else {
-      $from = $user->getCreatedTime();
-      $output .= '<p>' . t('This is your balance sheet.') . '</p>';
+      $from = $viewed_user->getCreatedTime();
+    }
+    if ($viewed_user !== $user) {
+      // Looking at another user's account.
+      $output .= '<p>' . $this->t("This is @user's balance sheet.", ['@user' => $viewed_user->getDisplayName()]) . '</p>';
+    }
+    else {
+      // Looking at own account.
+      $output .= '<p>' . $this->t('This is your balance sheet.') . '</p>';
     }
 
-    $output .= '<p>' . t("This shows recent credits and debits to your account. Entries from a specific date period may be viewed by selecting a date range using the boxes below labelled 'From' and 'To'") . '</p>';
+    $output .= '<p>' . $this->t("This shows recent credits and debits to your account. Entries from a specific date period may be viewed by selecting a date range using the boxes below labelled 'From' and 'To'") . '</p>';
 
     $form['helptext'] = ['#markup' => $output];
 
     $form_state->disableRedirect();
 
-    $format = 'Y-m-d H:i:s';
+    $format = 'm/d/Y';
 
-    /*
-  $form['date_from'] = array(
-    '#type' => 'date_popup',
-    '#title' => t('From'),
-    '#default_value' => date($format, $user->created),
-    '#date_format' => $format,
-    '#date_label_position' => 'within',
-    '#date_timezone' => 'America/Chicago',
-    '#date_increment' => 15,
-    '#date_year_range' => '-3:+3',
-  );
-  $form['date_to'] = array(
-    '#type' => 'date_popup',
-    '#title' => t('To'),
-    '#default_value' => date($format, $_SERVER['REQUEST_TIME']),
-    '#date_format' => $format,
-    '#date_label_position' => 'within',
-    '#date_timezone' => 'America/Chicago',
-    '#date_increment' => 15,
-    '#date_year_range' => '-3:+3',
-  );
-  $form['submit'] = array(
-    '#type' => 'submit',
-    '#value' => t('Display'),
-  );*/
+    $form['date_from'] = [
+      '#type' => 'date',
+      '#title' => t('From'),
+      '#default_value' => date($format, $from),
+      '#date_format' => $format,
+      '#date_label_position' => 'within',
+      '#date_increment' => 15,
+      '#date_year_range' => '-3:+3',
+    ];
+    $form['date_to'] = [
+      '#type' => 'date',
+      '#title' => t('To'),
+      '#default_value' => date($format, $to),
+      '#date_format' => $format,
+      '#date_label_position' => 'within',
+      '#date_increment' => 15,
+      '#date_year_range' => '-3:+3',
+    ];
+    $form['submit'] = [
+      '#type' => 'submit',
+      '#value' => t('Display'),
+    ];
 
-    $form['accounts'] = balance_tracker_balance_table(0, REQUEST_TIME, isset($viewed_user) ? $viewed_user->id() : $user->id());
+    $form['accounts'] = balance_tracker_balance_table($from, $to, $viewed_user->id());
     $form['pager'] = [
       '#type' => 'pager',
       '#tags' => NULL,

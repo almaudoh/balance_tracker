@@ -19,7 +19,7 @@ function balance_tracker_user_view_alter(array &$build, UserInterface $account, 
   if ($build['#view_mode'] === 'full' && \Drupal::config('balance_tracker.settings')->get('show_in_profile')) {
     if ($current_user->hasPermission('view all balances') || ($current_user->hasPermission('view own balance') && $account->id() === $current_user->id())) {
       $balance = balance_tracker_format_currency(\Drupal::service('balance_tracker.storage')->getBalance($account->id()));
-      $build['user_balance'] = array(
+      $build['user_balance'] = [
         '#type' => 'item',
         '#markup' => '<h4 class="label">' . t('Current Balance') . '</h4> ' . $balance,
         'link' => [
@@ -29,7 +29,7 @@ function balance_tracker_user_view_alter(array &$build, UserInterface $account, 
           '#prefix' => '<p>',
           '#suffix' => '</p>',
         ],
-      );
+      ];
     }
   }
 }
@@ -51,13 +51,13 @@ function balance_tracker_user_view_alter(array &$build, UserInterface $account, 
 function balance_tracker_balance_table($from, $to, $uid) {
   $records = \Drupal::service('balance_tracker.storage')->getItemsRange($uid, 25, $from, $to);
   // Format the records from the DB before we display them.
-  $rows = array();
+  $rows = [];
   $date_type = \Drupal::config('balance_tracker.settings')->get('date_format');
   $custom_format = \Drupal::config('balance_tracker.settings')->get('custom_date_format');
   foreach ($records as $record) {
     $record = (array) $record;
     // Get our date and time settings.
-    $record['timestamp'] = format_date($record['timestamp'], $date_type, $custom_format);
+    $record['timestamp'] = \Drupal::service('date.formatter')->format($record['timestamp'], $date_type, $custom_format);
 
     // Format the currency as needed.
     $record['balance'] = balance_tracker_format_currency($record['balance']);
@@ -74,18 +74,18 @@ function balance_tracker_balance_table($from, $to, $uid) {
     $rows[] = $record;
   }
 
-  $header = array(
-    'timestamp' => array('data' => t('Time')),
-    'message' => array('data' => t('Message')),
-    'amount' => array('data' => t('Amount')),
-    'balance' => array('data' => t('Balance')),
-  );
+  $header = [
+    'timestamp' => ['data' => t('Time')],
+    'message' => ['data' => t('Message')],
+    'amount' => ['data' => t('Amount')],
+    'balance' => ['data' => t('Balance')],
+  ];
 
   return [
     '#type' => 'table',
     '#header' => $header,
     '#rows' => $rows,
-    '#caption' => t("@user's Balance", array('@user' => User::load($uid)->getDisplayName())),
+    '#caption' => t("@user's Balance", ['@user' => User::load($uid)->getDisplayName()]),
     '#sticky' => TRUE,
     '#empty' => t('There are no balance items for this user.'),
     '#attached' => [

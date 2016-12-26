@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\balance_tracker\Controller\DefaultController.
- */
-
 namespace Drupal\balance_tracker\Controller;
 
 use Drupal\Core\Controller\ControllerBase;

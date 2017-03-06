@@ -4,9 +4,7 @@ namespace Drupal\balance_tracker\Form;
 
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Render\Element;
 use Drupal\user\Entity\User;
-use Drupal\user\UserInterface;
 
 /**
  * Builds the date selection form at the top of the balance page.

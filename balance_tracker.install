@@ -48,7 +48,7 @@ function balance_tracker_schema() {
         'size' => 'normal',
         'not null' => TRUE,
         'default' => 0,
-        'precision' => '10',
+        'precision' => 20,
         'scale' => 4,
       ),
       'balance' => array(
@@ -57,7 +57,7 @@ function balance_tracker_schema() {
         'size' => 'normal',
         'not null' => TRUE,
         'default' => 0,
-        'precision' => '10',
+        'precision' => 20,
         'scale' => 4,
       ),
     ),

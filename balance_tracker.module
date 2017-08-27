@@ -1,14 +1,8 @@
 <?php
 
-/**
- * @file
- * The .module file for the Balance Tracker module.
- */
-
-use Drupal\Component\Render\FormattableMarkup;
+use Drupal\balance_tracker\Element\BalanceTable;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Url;
-use Drupal\user\Entity\User;
 use Drupal\user\UserInterface;
 
 /**
@@ -18,7 +12,7 @@ function balance_tracker_user_view_alter(array &$build, UserInterface $account, 
   $current_user = \Drupal::currentUser();
   if ($build['#view_mode'] === 'full' && \Drupal::config('balance_tracker.settings')->get('show_in_profile')) {
     if ($current_user->hasPermission('view all balances') || ($current_user->hasPermission('view own balance') && $account->id() === $current_user->id())) {
-      $balance = balance_tracker_format_currency(\Drupal::service('balance_tracker.storage')->getBalance($account->id()));
+      $balance = BalanceTable::formatCurrency(\Drupal::service('balance_tracker.storage')->getBalance($account->id()));
       $build['user_balance'] = [
         '#type' => 'item',
         '#markup' => '<h4 class="label">' . t('Current Balance') . '</h4> ' . $balance,
@@ -31,91 +25,5 @@ function balance_tracker_user_view_alter(array &$build, UserInterface $account, 
         ],
       ];
     }
-  }
-}
-
-/**
- * Returns the user's balance sheet items in table format.
- *
- * @param int $from
- *   The timestamp marking the beginning of the period for which we are retrieving balance items.
- * @param int $to
- *   The timestamp marking the end of the period for which we are retrieving balance items.
- * @param int $uid
- *   The uid of the user to display the balance sheet for. If $uid is not provided,
- *   the user making the request is assumed.
- *
- * @return array
- *   A table render array.
- */
-function balance_tracker_balance_table($from, $to, $uid) {
-  $records = \Drupal::service('balance_tracker.storage')->getItemsRange($uid, 25, $from, $to);
-  // Format the records from the DB before we display them.
-  $rows = [];
-  $date_type = \Drupal::config('balance_tracker.settings')->get('date_format');
-  $custom_format = \Drupal::config('balance_tracker.settings')->get('custom_date_format');
-  foreach ($records as $record) {
-    $record = (array) $record;
-    // Get our date and time settings.
-    $record['timestamp'] = \Drupal::service('date.formatter')->format($record['timestamp'], $date_type, $custom_format);
-
-    // Format the currency as needed.
-    $record['balance'] = balance_tracker_format_currency($record['balance']);
-
-    // Add class names to credits and debits so we can color them.
-    if ($record['type'] === 'debit') {
-      $record['amount'] = new FormattableMarkup('<span class="debit">-@amount</span>', ['@amount' => balance_tracker_format_currency($record['amount'])]);
-    }
-    elseif ($record['type'] === 'credit') {
-      $record['amount'] = new FormattableMarkup('<span class="credit">@amount</span>', ['@amount' => balance_tracker_format_currency($record['amount'])]);
-    }
-
-    unset($record['type']);
-    $rows[] = $record;
-  }
-
-  $header = [
-    'timestamp' => ['data' => t('Time')],
-    'message' => ['data' => t('Message')],
-    'amount' => ['data' => t('Amount')],
-    'balance' => ['data' => t('Balance')],
-  ];
-
-  return [
-    '#type' => 'table',
-    '#header' => $header,
-    '#rows' => $rows,
-    '#caption' => t("@user's Balance", ['@user' => User::load($uid)->getDisplayName()]),
-    '#sticky' => TRUE,
-    '#empty' => t('There are no balance items for this user.'),
-    '#attached' => [
-      'library' => ['balance_tracker/balance_table'],
-    ],
-  ];
-}
-
-/**
- * Function to format a currency according to the admin settings.
- *
- * @param float $value
- *   A float containing the currency value to be displayed.
- *
- * @return string
- *   A string with the formatted currency.
- */
-function balance_tracker_format_currency($value) {
-  $config = \Drupal::config('balance_tracker.settings');
-  $symbol = $config->get('currency_symbol');
-  $position = $config->get('currency_symbol_position');
-  $thousands_separator = $config->get('thousands_separator');
-  $decimal_separator = $config->get('decimal_separator');
-
-  $number = number_format($value, 2, $decimal_separator, $thousands_separator);
-
-  if ($position === 'before') {
-    return $symbol . $number;
-  }
-  else {
-    return $number . $symbol;
   }
 }

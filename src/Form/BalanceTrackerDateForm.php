@@ -92,8 +92,12 @@ class BalanceTrackerDateForm extends FormBase {
       '#type' => 'submit',
       '#value' => t('Display'),
     ];
-
-    $form['accounts'] = balance_tracker_balance_table($from, $to, $viewed_user->id());
+    $form['accounts'] = [
+      '#type' => 'balance_table',
+      '#date_from' => $from,
+      '#date_to' => $to,
+      '#user' => $viewed_user,
+    ];
     $form['pager'] = [
       '#type' => 'pager',
       '#tags' => NULL,

@@ -171,7 +171,8 @@ class BalanceTrackerStorage {
   public function getItemsRange($uid, $per_page = 25, $from = 0, $to = REQUEST_TIME) {
     $rows = [];
     $query = $this->database->select('balance_items', 'b')
-      ->extend('Drupal\Core\Database\Query\PagerSelectExtender');
+      ->extend('Drupal\Core\Database\Query\PagerSelectExtender')
+      ->extend('Drupal\Core\Database\Query\TableSortExtender');
     $results = $query
       ->fields('b', ['timestamp', 'message', 'type', 'amount', 'balance'])
       ->condition('uid', $uid)
@@ -181,6 +182,36 @@ class BalanceTrackerStorage {
       ->orderBy('bid', 'DESC')
       ->execute();
 
+    foreach ($results as $row) {
+      $rows[] = $row;
+    }
+
+    return $rows;
+  }
+
+  /**
+   * Returns the balances for all users.
+   *
+   * This should be used in conjunction with a pager to get the desired results.
+   *
+   * @param int $per_page
+   *   The number of results to return per page.
+   *
+   * @return array
+   */
+  public function getAllUserBalances($per_page = 25) {
+    $query = $this->database->select('balance_items', 'b1')
+      ->extend('Drupal\Core\Database\Query\PagerSelectExtender')
+      ->extend('Drupal\Core\Database\Query\TableSortExtender');
+    $query->addField('b1', 'uid', 'uid');
+    $query->addExpression('(SELECT b.balance FROM {balance_items} b
+                            WHERE b.uid = b1.uid
+                            ORDER BY b.bid DESC LIMIT 0,1)', 'balance');
+    $query->groupBy('b1.uid');
+    $query->limit($per_page);
+    $results = $query->execute();
+
+    $rows = [];
     foreach ($results as $row) {
       $rows[] = $row;
     }

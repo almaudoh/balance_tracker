@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\balance_tracker\Plugin\Block\BalanceAdjustmentBlock.
- */
-
 namespace Drupal\balance_tracker\Plugin\Block;
 
 use Drupal\Core\Access\AccessResult;

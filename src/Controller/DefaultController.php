@@ -2,9 +2,11 @@
 
 namespace Drupal\balance_tracker\Controller;
 
+use Drupal\balance_tracker\Element\BalanceTable;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Url;
 use Drupal\user\Entity\User;
+use Drupal\user\UserInterface;
 
 /**
  * Default controller for the balance_tracker module.
@@ -37,31 +39,21 @@ class DefaultController extends ControllerBase {
       ),
     );
 
-    $query = db_select('balance_items', 'b1')
-      ->extend('Drupal\Core\Database\Query\PagerSelectExtender')
-      ->extend('Drupal\Core\Database\Query\TableSortExtender');
-    $query->addField('b1', 'uid', 'uid');
-    $query->addExpression('(SELECT b.balance FROM {balance_items} b
-                            WHERE b.uid = b1.uid
-                            ORDER BY b.bid DESC LIMIT 0,1)', 'balance');
-    $query->groupBy('b1.uid');
-    $query->limit(25);
-    $results = $query->execute();
-
-    $rows = array();
-    foreach ($results as $result) {
+    $rows = [];
+    foreach (\Drupal::service('balance_tracker.storage')->getAllUserBalances() as $result) {
       // Swap the UID result for a fully formatted link to the user's balance.
       /** @var \Drupal\user\Entity\User $user */
-      $user = User::load($result->uid);
-      $row['user'] = [
-        'data' => [
-          '#type' => 'link',
-          '#title' => $user->getDisplayname(),
-          '#url' => new Url('balance_tracker.user_balance', ['user' => $user->id()]),
-        ],
-      ];
-      $row['balance'] = balance_tracker_format_currency($result->balance);
-      $rows[] = $row;
+      if ($user = User::load($result->uid)) {
+        $row['user'] = [
+          'data' => [
+            '#type' => 'link',
+            '#title' => $user->getDisplayname(),
+            '#url' => new Url('balance_tracker.user_balance', ['user' => $user->id()]),
+          ],
+        ];
+        $row['balance'] = BalanceTable::formatCurrency($result->balance);
+        $rows[] = $row;
+      }
     }
 
     $output['table'] = [
@@ -76,6 +68,13 @@ class DefaultController extends ControllerBase {
       '#tags' => [],
     ];
     return $output;
+  }
+
+  /**
+   * Title callback for the balance_tracker.user_balance route.
+   */
+  public function getPageTitle(UserInterface $user) {
+    return $this->t('@user\'s balance', ['@user' => $user->getDisplayName()]);
   }
 
 }

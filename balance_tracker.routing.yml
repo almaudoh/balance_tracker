@@ -8,7 +8,7 @@ balance_tracker.balance:
 balance_tracker.user_balance:
   path: /user/{user}/balance
   defaults:
-    _title: 'User''s Balance'
+    _title_callback: \Drupal\balance_tracker\Controller\DefaultController::getPageTitle
     _form: \Drupal\balance_tracker\Form\BalanceTrackerDateForm
   requirements:
     _permission: 'view all balances'

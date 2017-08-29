@@ -5,6 +5,7 @@ namespace Drupal\balance_tracker\Form;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\user\Entity\User;
+use Drupal\user\UserInterface;
 
 /**
  * Builds the date selection form at the top of the balance page.
@@ -21,9 +22,11 @@ class BalanceTrackerDateForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
-    /** @var \Drupal\user\Entity\User $user */
-    $user = User::load($this->currentUser()->id());
+  public function buildForm(array $form, FormStateInterface $form_state, UserInterface $user = NULL) {
+    if ($user === NULL) {
+      $user = User::load($this->currentUser()->id());
+    }
+
     $output = '';
 
     // Preset $to and $from based on form variables if available, or on sensible
@@ -36,26 +39,16 @@ class BalanceTrackerDateForm extends FormBase {
       $to = REQUEST_TIME;
     }
 
-    // Set viewed user in case we're looking at someone else's account.
-    if ($this->getRouteMatch()->getRouteName() === 'balance_tracker.user_balance'
-      && ($uid = $this->getRequest()->get('user')) && $uid != $user->id()) {
-      /** @var \Drupal\user\Entity\User $viewed_user */
-      $viewed_user = User::load($uid);
-    }
-    else {
-      $viewed_user = $user;
-    }
-
     // Use value from form.
     if ($form_state->get('date_from')) {
       $from = strtotime($form_state->get('date_from'));
     }
     else {
-      $from = $viewed_user->getCreatedTime();
+      $from = $user->getCreatedTime();
     }
-    if ($viewed_user !== $user) {
+    if ($user->id() !== $this->currentUser()->id()) {
       // Looking at another user's account.
-      $output .= '<p>' . $this->t("This is @user's balance sheet.", ['@user' => $viewed_user->getDisplayName()]) . '</p>';
+      $output .= '<p>' . $this->t("This is @user's balance sheet.", ['@user' => $user->getDisplayName()]) . '</p>';
     }
     else {
       // Looking at own account.
@@ -96,7 +89,7 @@ class BalanceTrackerDateForm extends FormBase {
       '#type' => 'balance_table',
       '#date_from' => $from,
       '#date_to' => $to,
-      '#user' => $viewed_user,
+      '#user' => $user,
     ];
     $form['pager'] = [
       '#type' => 'pager',

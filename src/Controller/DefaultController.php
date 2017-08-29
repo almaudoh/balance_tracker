@@ -3,6 +3,7 @@
 namespace Drupal\balance_tracker\Controller;
 
 use Drupal\balance_tracker\Element\BalanceTable;
+use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Url;
 use Drupal\user\Entity\User;
@@ -13,6 +14,9 @@ use Drupal\user\UserInterface;
  */
 class DefaultController extends ControllerBase {
 
+  /**
+   * Route controller for admin view of all user balances.
+   */
   public function allBalancesPage() {
     $output = [
       '#cache' => [
@@ -34,7 +38,6 @@ class DefaultController extends ControllerBase {
       'uid' => array('data' => $this->t('User'), 'sort' => 'uid'),
       'balance' => array(
         'data' => $this->t('Balance'),
-        'sort' => 'balance',
         'sort' => 'desc',
       ),
     );
@@ -75,6 +78,21 @@ class DefaultController extends ControllerBase {
    */
   public function getPageTitle(UserInterface $user) {
     return $this->t('@user\'s balance', ['@user' => $user->getDisplayName()]);
+  }
+
+  /**
+   * Redirects to a user's own balance page.
+   */
+  public function userPage() {
+    return $this->redirect('balance_tracker.user_balance', ['user' => $this->currentUser()->id()]);
+  }
+
+  /**
+   * Access check callback for user balance form routes.
+   */
+  public function balanceFormAccess(UserInterface $user) {
+    $access = AccessResult::allowedIfHasPermission($this->currentUser(), 'view all balances');
+    return $access->orIf(AccessResult::allowedIf($this->currentUser()->hasPermission('view own balance') && $user->id() === $this->currentUser()->id()));
   }
 
 }

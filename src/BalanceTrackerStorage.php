@@ -25,9 +25,12 @@ class BalanceTrackerStorage {
    */
   protected $moduleHandler;
 
+  protected $instance;
+
   public function __construct(Connection $database, ModuleHandlerInterface $module_handler) {
     $this->database = $database;
     $this->moduleHandler = $module_handler;
+    $this->instance = 'default';
   }
 
   /**
@@ -99,11 +102,12 @@ class BalanceTrackerStorage {
       'message' => $message,
       'amount' => $amount,
       'balance' => $balance,
+      'instance' => $this->instance,
     );
 
     $this->database->insert('balance_items')->fields($fields)->execute();
 
-    $this->moduleHandler->invokeAll('balance_write', [$uid, $type, $amount, $message]);
+    $this->moduleHandler->invokeAll('balance_write', [$uid, $type, $amount, $message, $this->instance]);
 
     // Invalidate cache tags.
     Cache::invalidateTags(['balance_tracker:user:' . $uid, 'balance_tracker']);
@@ -124,6 +128,7 @@ class BalanceTrackerStorage {
     $result = $this->database->select('balance_items', 'bi')
       ->fields('bi', array('balance'))
       ->condition('uid', $uid, '=')
+      ->condition('instance', $this->instance, '=')
       ->orderBy('bi.bid', 'DESC')
       ->execute()
       ->fetchObject();
@@ -178,6 +183,7 @@ class BalanceTrackerStorage {
       ->condition('uid', $uid)
       ->condition('timestamp', $from, '>=')
       ->condition('timestamp', $to, '<=')
+      ->condition('instance', $this->instance)
       ->limit($per_page)
       ->orderBy('bid', 'DESC')
       ->execute();
@@ -206,6 +212,7 @@ class BalanceTrackerStorage {
     $query->addField('b1', 'uid', 'uid');
     $query->addExpression('(SELECT b.balance FROM {balance_items} b
                             WHERE b.uid = b1.uid
+                            AND b.instance = "' . $this->instance . '"
                             ORDER BY b.bid DESC LIMIT 0,1)', 'balance');
     $query->groupBy('b1.uid');
     $query->limit($per_page);
@@ -217,6 +224,15 @@ class BalanceTrackerStorage {
     }
 
     return $rows;
+  }
+
+  public function setInstance($instance) {
+    $this->instance = $instance;
+    return $this;
+  }
+
+  public function getInstance() {
+    return $this->instance;
   }
 
 }

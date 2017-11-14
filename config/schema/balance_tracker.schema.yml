@@ -1,5 +1,5 @@
 balance_tracker.settings:
-  type: mapping
+  type: config_object
   label: Settings
   mapping:
     show_in_profile:
